@@ -1,26 +1,26 @@
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Scanner;
-import java.util.Stack;
+ class UseCase7PalindromeCheckerApp {
 
-public class UseCase5PalindromeCheckerApp {
-
-    // Method to check palindrome using Stack (LIFO)
+    // Method to check palindrome using Deque (Double Ended Queue)
     public static boolean isPalindrome(String str) {
-        // Step 1: Push all characters into the stack
-        Stack<Character> stack = new Stack<>();
 
+        // Step 1: Insert all characters into the Deque
+        Deque<Character> deque = new ArrayDeque<>();
         for (int i = 0; i < str.length(); i++) {
-            stack.push(str.charAt(i));
+            deque.addLast(str.charAt(i));
         }
 
-        // Step 2: Pop characters and compare with original string
-        for (int i = 0; i < str.length(); i++) {
-            char popped = stack.pop(); // Pops in reverse order (LIFO)
-            if (str.charAt(i) != popped) {
-                return false; // Mismatch found, not a palindrome
+        // Step 2 & 3: Remove first & last, compare until deque has 0 or 1 element
+        while (deque.size() > 1) {
+            char front = deque.removeFirst();
+            char rear = deque.removeLast();
+            if (front != rear) {
+                return false;
             }
         }
 
-        // Step 3: All characters matched
         return true;
     }
 
@@ -28,38 +28,49 @@ public class UseCase5PalindromeCheckerApp {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("==============================================");
-        System.out.println("  UC5: Palindrome Check - Stack Based");
+        System.out.println("  UC7: Palindrome Check - Deque Based");
         System.out.println("==============================================");
         System.out.print("Enter a string to check: ");
         String input = scanner.nextLine();
 
-        // Step 1: Push characters into the stack and display
-        Stack<Character> stack = new Stack<>();
-        System.out.println("\n--- Pushing Characters into Stack ---");
+        // Step 1: Insert characters into Deque and display
+        Deque<Character> deque = new ArrayDeque<>();
+        System.out.println("\n--- Inserting Characters into Deque ---");
         for (int i = 0; i < input.length(); i++) {
             char c = input.charAt(i);
-            stack.push(c);
-            System.out.println("  Pushed: '" + c + "'  --> Stack: " + stack);
+            deque.addLast(c);
+            System.out.println("  Inserted: '" + c + "'  --> Deque: " + deque);
         }
 
-        // Step 2: Pop characters and compare
-        System.out.println("\n--- Popping Characters & Comparing ---");
+        // Step 2 & 3: Remove first & last, compare
+        System.out.println("\n--- Comparing Front & Rear Characters ---");
         boolean palindrome = true;
-        Stack<Character> tempStack = (Stack<Character>) stack.clone(); // Clone for display
+        int step = 1;
 
-        for (int i = 0; i < input.length(); i++) {
-            char popped = tempStack.pop();
-            char original = input.charAt(i);
-            System.out.println("  Original[" + i + "] = '" + original +
-                    "'  <-->  Popped = '" + popped + "'" +
-                    (original == popped ? "  => Match!" : "  => Mismatch!"));
-            if (original != popped) {
+        while (deque.size() > 1) {
+            char front = deque.removeFirst();
+            char rear = deque.removeLast();
+
+            if (front == rear) {
+                System.out.println("  Step " + step + ": Front = '" + front
+                        + "'  <-->  Rear = '" + rear
+                        + "'  => Match!   Remaining: " + deque);
+            } else {
+                System.out.println("  Step " + step + ": Front = '" + front
+                        + "'  <-->  Rear = '" + rear
+                        + "'  => Mismatch!");
                 palindrome = false;
                 break;
             }
+            step++;
         }
 
-        // Step 3: Print result
+        if (palindrome && deque.size() == 1) {
+            System.out.println("  Middle character '" + deque.peekFirst()
+                    + "' ignored (odd-length string).");
+        }
+
+        // Print result
         System.out.println("\n----------------------------------------------");
         if (palindrome) {
             System.out.println("Result: \"" + input + "\" IS a palindrome.");
