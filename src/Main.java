@@ -1,69 +1,65 @@
 import java.util.Scanner;
+import java.util.Stack;
 
-public class UseCase4PalindromeCheckerApp {
+public class UseCase5PalindromeCheckerApp {
 
-    // Method to check palindrome using char[] and two-pointer technique
+    // Method to check palindrome using Stack (LIFO)
     public static boolean isPalindrome(String str) {
-        // Step 1: Convert string to character array
-        char[] chars = str.toCharArray();
+        // Step 1: Push all characters into the stack
+        Stack<Character> stack = new Stack<>();
 
-        // Step 2: Two-pointer approach
-        int start = 0;
-        int end = chars.length - 1;
+        for (int i = 0; i < str.length(); i++) {
+            stack.push(str.charAt(i));
+        }
 
-        // Step 3: Compare start & end characters
-        while (start < end) {
-            if (chars[start] != chars[end]) {
+        // Step 2: Pop characters and compare with original string
+        for (int i = 0; i < str.length(); i++) {
+            char popped = stack.pop(); // Pops in reverse order (LIFO)
+            if (str.charAt(i) != popped) {
                 return false; // Mismatch found, not a palindrome
             }
-            start++; // Move start pointer forward
-            end--;   // Move end pointer backward
         }
-        return true; // All characters matched
+
+        // Step 3: All characters matched
+        return true;
     }
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("==============================================");
-        System.out.println(" UC4: Palindrome Check - Character Array");
+        System.out.println("  UC5: Palindrome Check - Stack Based");
         System.out.println("==============================================");
         System.out.print("Enter a string to check: ");
         String input = scanner.nextLine();
 
-        // Convert to char[] and display it
-        char[] charArray = input.toCharArray();
-        System.out.print("Character Array     : ");
-        System.out.print("[");
-        for (int i = 0; i < charArray.length; i++) {
-            System.out.print("'" + charArray[i] + "'");
-            if (i < charArray.length - 1) {
-                System.out.print(", ");
-            }
+        // Step 1: Push characters into the stack and display
+        Stack<Character> stack = new Stack<>();
+        System.out.println("\n--- Pushing Characters into Stack ---");
+        for (int i = 0; i < input.length(); i++) {
+            char c = input.charAt(i);
+            stack.push(c);
+            System.out.println("  Pushed: '" + c + "'  --> Stack: " + stack);
         }
-        System.out.println("]");
 
-        // Show two-pointer comparison steps
-        System.out.println("\n--- Two-Pointer Comparison ---");
-        int start = 0;
-        int end = charArray.length - 1;
+        // Step 2: Pop characters and compare
+        System.out.println("\n--- Popping Characters & Comparing ---");
         boolean palindrome = true;
+        Stack<Character> tempStack = (Stack<Character>) stack.clone(); // Clone for display
 
-        while (start < end) {
-            System.out.println("Comparing index [" + start + "] = '" + charArray[start] +
-                    "'  <-->  index [" + end + "] = '" + charArray[end] + "'");
-            if (charArray[start] != charArray[end]) {
-                System.out.println("  => Mismatch found!");
+        for (int i = 0; i < input.length(); i++) {
+            char popped = tempStack.pop();
+            char original = input.charAt(i);
+            System.out.println("  Original[" + i + "] = '" + original +
+                    "'  <-->  Popped = '" + popped + "'" +
+                    (original == popped ? "  => Match!" : "  => Mismatch!"));
+            if (original != popped) {
                 palindrome = false;
                 break;
-            } else {
-                System.out.println("  => Match!");
             }
-            start++;
-            end--;
         }
 
-        // Display result
+        // Step 3: Print result
         System.out.println("\n----------------------------------------------");
         if (palindrome) {
             System.out.println("Result: \"" + input + "\" IS a palindrome.");
