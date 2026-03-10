@@ -1,74 +1,161 @@
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.Scanner;
- class UseCase7PalindromeCheckerApp {
 
-    // Method to check palindrome using Deque (Double Ended Queue)
-    public static boolean isPalindrome(String str) {
+public class UseCase8PalindromeCheckerApp {
 
-        // Step 1: Insert all characters into the Deque
-        Deque<Character> deque = new ArrayDeque<>();
-        for (int i = 0; i < str.length(); i++) {
-            deque.addLast(str.charAt(i));
+    // Node class for Singly Linked List
+    static class Node {
+        char data;
+        Node next;
+
+        Node(char data) {
+            this.data = data;
+            this.next = null;
         }
+    }
 
-        // Step 2 & 3: Remove first & last, compare until deque has 0 or 1 element
-        while (deque.size() > 1) {
-            char front = deque.removeFirst();
-            char rear = deque.removeLast();
-            if (front != rear) {
-                return false;
+    // Step 1: Convert string to linked list, return head node
+    public static Node buildLinkedList(String str) {
+        Node head = null;
+        Node tail = null;
+
+        for (int i = 0; i < str.length(); i++) {
+            Node newNode = new Node(str.charAt(i));
+            if (head == null) {
+                head = newNode;
+                tail = newNode;
+            } else {
+                tail.next = newNode;
+                tail = newNode;
             }
         }
+        return head;
+    }
 
-        return true;
+    // Step 2: Find middle using Fast and Slow pointer technique
+    public static Node findMiddle(Node head) {
+        Node slow = head;
+        Node fast = head;
+
+        while (fast != null && fast.next != null) {
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        return slow;
+    }
+
+    // Step 3: Reverse second half of linked list in-place
+    public static Node reverseList(Node head) {
+        Node prev = null;
+        Node curr = head;
+
+        while (curr != null) {
+            Node nextNode = curr.next;
+            curr.next = prev;
+            prev = curr;
+            curr = nextNode;
+        }
+        return prev;
+    }
+
+    // Print linked list nodes
+    public static void printList(Node head) {
+        Node curr = head;
+        System.out.print("[");
+        while (curr != null) {
+            System.out.print("'" + curr.data + "'");
+            if (curr.next != null) {
+                System.out.print(" -> ");
+            }
+            curr = curr.next;
+        }
+        System.out.println("]");
+    }
+
+    // Main palindrome check method
+    public static boolean isPalindrome(Node head) {
+
+        if (head == null || head.next == null) {
+            return true;
+        }
+
+        // Find middle of the linked list
+        Node middle = findMiddle(head);
+
+        // Reverse second half starting from middle
+        Node secondHalf = reverseList(middle);
+
+        // Compare first and second halves
+        Node first = head;
+        Node second = secondHalf;
+
+        boolean result = true;
+        while (second != null) {
+            if (first.data != second.data) {
+                result = false;
+                break;
+            }
+            first = first.next;
+            second = second.next;
+        }
+
+        // Restore the list (reverse second half back)
+        reverseList(secondHalf);
+
+        return result;
     }
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("==============================================");
-        System.out.println("  UC7: Palindrome Check - Deque Based");
+        System.out.println("  UC8: Palindrome Check - Linked List Based");
         System.out.println("==============================================");
         System.out.print("Enter a string to check: ");
         String input = scanner.nextLine();
 
-        // Step 1: Insert characters into Deque and display
-        Deque<Character> deque = new ArrayDeque<>();
-        System.out.println("\n--- Inserting Characters into Deque ---");
-        for (int i = 0; i < input.length(); i++) {
-            char c = input.charAt(i);
-            deque.addLast(c);
-            System.out.println("  Inserted: '" + c + "'  --> Deque: " + deque);
-        }
+        // Step 1: Build linked list from string
+        Node head = buildLinkedList(input);
+        System.out.println("\n--- Step 1: Linked List Built ---");
+        System.out.print("  List: ");
+        printList(head);
 
-        // Step 2 & 3: Remove first & last, compare
-        System.out.println("\n--- Comparing Front & Rear Characters ---");
+        // Step 2: Find middle node
+        Node middle = findMiddle(head);
+        System.out.println("\n--- Step 2: Finding Middle (Fast & Slow Pointer) ---");
+        System.out.println("  Middle Node: '" + middle.data + "'");
+
+        // Step 3: Reverse second half
+        Node secondHalf = reverseList(middle);
+        System.out.println("\n--- Step 3: Reversed Second Half ---");
+        System.out.print("  Reversed Half: ");
+        printList(secondHalf);
+
+        // Compare both halves
+        System.out.println("\n--- Step 4: Comparing First & Second Halves ---");
+        Node first = head;
+        Node second = secondHalf;
         boolean palindrome = true;
         int step = 1;
 
-        while (deque.size() > 1) {
-            char front = deque.removeFirst();
-            char rear = deque.removeLast();
-
-            if (front == rear) {
-                System.out.println("  Step " + step + ": Front = '" + front
-                        + "'  <-->  Rear = '" + rear
-                        + "'  => Match!   Remaining: " + deque);
+        while (second != null) {
+            if (first.data == second.data) {
+                System.out.println("  Step " + step + ": '"
+                        + first.data + "'  <-->  '"
+                        + second.data + "'  => Match!");
             } else {
-                System.out.println("  Step " + step + ": Front = '" + front
-                        + "'  <-->  Rear = '" + rear
-                        + "'  => Mismatch!");
+                System.out.println("  Step " + step + ": '"
+                        + first.data + "'  <-->  '"
+                        + second.data + "'  => Mismatch!");
                 palindrome = false;
                 break;
             }
+            first = first.next;
+            second = second.next;
             step++;
         }
 
-        if (palindrome && deque.size() == 1) {
-            System.out.println("  Middle character '" + deque.peekFirst()
-                    + "' ignored (odd-length string).");
-        }
+        // Restore the original list
+        reverseList(secondHalf);
 
         // Print result
         System.out.println("\n----------------------------------------------");
